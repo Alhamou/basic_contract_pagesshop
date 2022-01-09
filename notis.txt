@@ -1,0 +1,24 @@
+// Keccak-256
+
+// http://ethviewer.live/
+
+
+
+
+/// WEB3
+
+const instance = new web3.eth.Contracts("")
+
+web3.eth.sendTransaction({from, to, value, data})
+
+accounts
+
+web3.eth.getBlock()
+
+
+JSON-RPC
+
+// hex to decimal
+https://www.rapidtables.com/convert/number/decimal-to-hex.html
+
+// Solidity ia for every 32 bytes are Slot[{slot = 32 bytes}]
