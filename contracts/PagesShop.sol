@@ -12,12 +12,26 @@ contract PagesShop{
     // [receive], spical function to receive ETH
 
     address public owner;
-    address[] public  funders;
+    address public funder;
+    address[] public mempers;
+    uint public countFunders;
+
+    struct EntityUsers {
+        address funder;
+        uint index;
+    }
+
+    EntityUsers[] public users;
+
+
+    mapping(uint => address) public funders;
 
     // this constructor will executet onetime after deploy the Contract.
-    constructor() payable {
+    constructor() {
         owner = msg.sender;
+
     }
+
 
     // modifier, check only Owner access.
     modifier onlyOwner{
@@ -44,12 +58,48 @@ contract PagesShop{
     }
 
 
+    // change owner sheep the Contract within the Admin.
+    function changeOwner(address newOwner) external onlyOwner {
+        owner = newOwner;
+    }
+
+
     function getFunders() external view returns(address[] memory){
-        return funders;
+
+        address[] memory _funders = new address[](countFunders);
+
+        for(uint i = 0; i < countFunders; i++){
+
+            _funders[i] = funders[i];
+
+        }
+
+        return _funders;
+
     }
 
     function addFunds() external payable{
-        funders.push(msg.sender);
+
+        bool isEntity = false;
+
+        address sender = msg.sender;
+
+        for(uint i = 0; i < countFunders; i++){
+
+            if(funders[i] == sender){
+
+                isEntity = true;
+
+            }
+
+        }
+
+        if(!isEntity){
+
+            uint index = countFunders++;
+            funders[index] = msg.sender;
+        }
+
     }
 
     // this function is spical, colled when reseive Eth, it dont have to call the name function to make txs.
@@ -57,7 +107,17 @@ contract PagesShop{
         // reseive ETH from ather Account or ather Contracts
     }
 
-    function withdrawBalance(uint amount) external onlyOwner {
+    function withdrawBalance(uint amount) external onlyOwner withdraw(amount) {
         payable(msg.sender).transfer(amount);
     }
 }
+
+// const instance = await PagesShop.deployed()
+// instance.addFunds({from: accounts[2], value:"2000000000000000000"})
+// instance.addFunds({from: accounts[3], value:"2000000000000000000"})
+// instance.owner()
+// instance.funders(0)
+// instance.getFunders()
+// instance.withdrawBalance("100000000000000000", {from: accounts[3]}) // error, onlyowner
+// instance.withdrawBalance("100000000000000000", {from: accounts[0]}) // success, onlyowner
+// instance.withdrawBalance("2000000000000000000") // error, can not withdraw more then 1 eth
