@@ -4,8 +4,9 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "./Owned.sol";
 import "./Logger.sol";
+import "./IPagesShop.sol";
 
-contract PagesShop is Owned, Logger{
+contract PagesShop is Owned, Logger, IPagesShop{
 
     // [External, public] - can every one send tx ETH
     // [pure, view] - readonly, no Gas feed.
@@ -28,9 +29,6 @@ contract PagesShop is Owned, Logger{
 
     mapping(uint => address) public funders;
 
-    function emitLogger()external pure override virtual returns(bytes32){
-        return "Hello world";
-    }
 
     // modifier, check only Owner access.
     modifier onlyOwner{
@@ -45,7 +43,7 @@ contract PagesShop is Owned, Logger{
     }
     
     // modifier with paramiter, withdraw use case.
-    modifier withdraw (uint amount){
+    modifier withdrawAmount (uint amount){
 
         require(
             amount <= 1000000000000000000,
@@ -56,6 +54,13 @@ contract PagesShop is Owned, Logger{
         _;
     }
 
+    function emitLogger()external pure override virtual returns(bytes32){
+        return "Hello world";
+    }
+    // this function is spical, colled when reseive Eth, it dont have to call the name function to make txs.
+    receive () external payable{
+        // reseive ETH from ather Account or ather Contracts
+    }
 
     // change owner sheep the Contract within the Admin.
     function changeOwner(address newOwner) external onlyOwner {
@@ -77,7 +82,7 @@ contract PagesShop is Owned, Logger{
 
     }
 
-    function addFunds() external payable{
+    function addFunds() override external payable{
 
         bool isEntity = false;
 
@@ -101,12 +106,9 @@ contract PagesShop is Owned, Logger{
 
     }
 
-    // this function is spical, colled when reseive Eth, it dont have to call the name function to make txs.
-    receive () external payable{
-        // reseive ETH from ather Account or ather Contracts
-    }
 
-    function withdrawBalance(uint amount) external onlyOwner withdraw(amount) {
+
+    function withdraw(uint amount) override external onlyOwner withdrawAmount(amount) {
         payable(msg.sender).transfer(amount);
     }
 }
