@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
+import "./Owned.sol";
+import "./Logger.sol";
 
-contract PagesShop{
+contract PagesShop is Owned, Logger{
 
     // [External, public] - can every one send tx ETH
     // [pure, view] - readonly, no Gas feed.
@@ -11,7 +13,7 @@ contract PagesShop{
     // [payable] can every one send tx ETH
     // [receive], spical function to receive ETH
 
-    address public owner;
+
     address public funder;
     address[] public mempers;
     uint public countFunders;
@@ -26,12 +28,9 @@ contract PagesShop{
 
     mapping(uint => address) public funders;
 
-    // this constructor will executet onetime after deploy the Contract.
-    constructor() {
-        owner = msg.sender;
-
+    function emitLogger()external pure override virtual returns(bytes32){
+        return "Hello world";
     }
-
 
     // modifier, check only Owner access.
     modifier onlyOwner{
