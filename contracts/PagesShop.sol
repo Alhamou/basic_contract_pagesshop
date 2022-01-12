@@ -67,11 +67,20 @@ contract PagesShop is Owned, Logger, IPagesShop{
         owner = newOwner;
     }
 
+    function getNum() override external view returns(uint) {
+        return num;
+    }
+
+    function setNum(uint _num) external override{
+        num = _num;
+    }
+
 
     function getFunders() external view returns(address[] memory){
 
         address[] memory _funders = new address[](countFunders);
 
+        
         for(uint i = 0; i < countFunders; i++){
 
             _funders[i] = funders[i];

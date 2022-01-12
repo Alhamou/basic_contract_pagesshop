@@ -6,7 +6,7 @@ pragma solidity >=0.4.22 <0.9.0;
 
 abstract contract Logger{
 
-    uint num;
+    uint public num;
 
     constructor(){
         num = 1000;
@@ -14,7 +14,11 @@ abstract contract Logger{
 
     function emitLogger() external pure virtual returns(bytes32){}
 
-    function getNum() external view returns(uint){
+    function getNum() external view virtual returns(uint){
         return num;
+    }
+
+    function setNum(uint _num) external virtual{
+        num = _num;
     }
 }

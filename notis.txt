@@ -22,3 +22,8 @@ JSON-RPC
 https://www.rapidtables.com/convert/number/decimal-to-hex.html
 
 // Solidity ia for every 32 bytes are Slot[{slot = 32 bytes}]
+
+
+// in abstract the external, can not be use insid a function.
+// internal, can be inhert from other contract local.
+// private, can only insid the class.
