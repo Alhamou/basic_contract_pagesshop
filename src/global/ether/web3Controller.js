@@ -35,18 +35,16 @@ export const web3Controller = (()=>{
       
       try{
         accounts = await web3Api.web3.eth.getAccounts()
-      }catch{
-
-      }
+      }catch{}
 
       return accounts
     }
+
     obj.getBalance = async function(web3Api){
 
       const {contract, web3} = web3Api
       const balance = await web3.eth.getBalance(contract.address)
       const fromWei = web3.utils.fromWei(balance, "ether")
-      // setBalance(fromWei)
 
       return fromWei
     }

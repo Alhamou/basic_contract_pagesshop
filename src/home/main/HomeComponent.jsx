@@ -20,17 +20,17 @@ function HomeComponent() {
 
   const reloadEffect = () => setReload(!reload)
 
-  const addListnerAccountChange = provider => {
-    provider.on("accountsChanged", accounts => setAccount(accounts[0]))
+  const addEventListner = provider => {
+    provider.on("accountsChanged", _ => window.location.reload())
   }
 
   useEffect(() => {
 
     (async ()=>{
       let provider = await detectEthereumProvider()
-      const contract = await loadContracts("PagesShop", provider)
       if(provider){
-        addListnerAccountChange(provider)
+        const contract = await loadContracts("PagesShop", provider)
+        addEventListner(provider)
         setWeb3Api({web3: new Web3(provider), provider, contract})
       } else{
           console.error("User denied accounts access!")
@@ -82,18 +82,24 @@ function HomeComponent() {
           {
             account
             ?
-              <Alert key="cdcdcd" variant="secondary">
+              
+              <Alert key="xx" variant="secondary">
                 {account}
               </Alert>
             : 
+              !web3Api.provider ?
+                <>
+                  <p>Wallet is not detected <a target="_blank" rel="noreferrer" href="https://docs.metamask.io">Insatll Metamask</a></p>
+                </>
+            :
               <button onClick={()=> web3Api.provider.request({method: "eth_requestAccounts"})}>
                 connect wallet 
               </button>
           }
 
           <br />
-          <button className="btn btn-info" onClick={addFunds}>donaite</button>
-          <button className="btn btn-success m-2" onClick={withdraw}>withdraw</button>
+          <button disabled={!account} className="btn btn-info" onClick={addFunds}>donaite</button>
+          <button disabled={!account} className="btn btn-success m-2" onClick={withdraw}>withdraw</button>
         </div>
       </>
     );
