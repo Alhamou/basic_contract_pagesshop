@@ -17,11 +17,11 @@ function HomeComponent() {
   const [web3Api, setWeb3Api] = useState({web3: null,provider: null,contract: null})
 
 
-
   const reloadEffect = () => setReload(!reload)
 
   const addEventListner = provider => {
     provider.on("accountsChanged", _ => window.location.reload())
+    provider.on("chainChanged", _ => window.location.reload())
   }
 
   useEffect(() => {
@@ -73,10 +73,10 @@ function HomeComponent() {
       <>
         <br /><br />
         <div className="container">
-          <h1>Hallo in your Wallet</h1>
+          <h1>Hallo to PagesShop Contract :)</h1>
 
           <h3>
-            Contract balance is: <Badge bg="secondary">{balance} ETH</Badge>
+          PagesShop contract balance is: <Badge bg="secondary">{balance} ETH</Badge>
           </h3>
           <br />
           {
@@ -84,7 +84,7 @@ function HomeComponent() {
             ?
               
               <Alert key="xx" variant="secondary">
-                {account}
+                <i>Your Account:</i> <b>{account}</b>
               </Alert>
             : 
               !web3Api.provider ?
@@ -92,14 +92,19 @@ function HomeComponent() {
                   <p>Wallet is not detected <a target="_blank" rel="noreferrer" href="https://docs.metamask.io">Insatll Metamask</a></p>
                 </>
             :
-              <button onClick={()=> web3Api.provider.request({method: "eth_requestAccounts"})}>
-                connect wallet 
-              </button>
+            <button className="btn btn-s btn-light" onClick={()=> web3Api.provider.request({method: "eth_requestAccounts"})}>
+              connect wallet 
+            </button> 
           }
 
           <br />
-          <button disabled={!account} className="btn btn-info" onClick={addFunds}>donaite</button>
-          <button disabled={!account} className="btn btn-success m-2" onClick={withdraw}>withdraw</button>
+
+          {
+            !web3Api.contract && <p className="text-danger">change your network to ganach</p>
+          }
+
+          <button disabled={!web3Api.contract || !account} className="btn btn-s btn-success" onClick={addFunds}>Donate 0.1 ETH</button>
+          <button disabled={!web3Api.contract || !account} className="btn btn-s btn-info m-2" onClick={withdraw}>Withdraw 0.1 ETH</button>
         </div>
       </>
     );

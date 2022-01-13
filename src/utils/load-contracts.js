@@ -8,6 +8,14 @@ export const loadContracts = async (name, provider)=>{
 
     const _contract = contract(Artifacts)
     await _contract.setProvider(provider)
-    return await _contract.deployed() 
+
+    let getContract = null
+    try{
+        getContract = await _contract.deployed() 
+
+    } catch{
+        console.error("change network to ganache")
+    }
+    return getContract
 
 }
