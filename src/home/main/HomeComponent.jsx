@@ -5,75 +5,70 @@ import Web3 from 'web3'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { loadContracts } from "../../utils/load-contracts";
 import { Badge, Alert } from 'react-bootstrap';
-import { contractFunctions } from "../../global/ether/functions";
+import { web3Controller } from "../../global/ether/web3Controller";
 
 import "./HomeComponent.css";
 
 function HomeComponent() {
 
-  const [accounts, setAccounts] = useState([])
+  const [account, setAccount] = useState([])
   const [balance, setBalance] = useState(null)
+  const [reload, setReload] = useState(false)
+  const [web3Api, setWeb3Api] = useState({web3: null,provider: null,contract: null})
 
-  const [web3Api, setWeb3Api] = useState({
-    web3: null,
-    provider: null,
-    contract: null
-  })
+
+
+  const reloadEffect = () => setReload(!reload)
+
+  const addListnerAccountChange = provider => {
+    provider.on("accountsChanged", accounts => setAccount(accounts[0]))
+  }
 
   useEffect(() => {
 
     (async ()=>{
-
       let provider = await detectEthereumProvider()
       const contract = await loadContracts("PagesShop", provider)
-
-      // await contract.addFunds({from: "0x8C014CEa741a56f18D4F4F99752C7ad02C0ce1D4", value:"2000000000000000000"})
-      // console.log(test.toString())
       if(provider){
-
+        addListnerAccountChange(provider)
         setWeb3Api({web3: new Web3(provider), provider, contract})
-
       } else{
           console.error("User denied accounts access!")
       }
-
     })()
-
-
   }, [])
 
+
   useEffect(()=>{
 
-    const getBalance = async () =>{
-
-      const {contract, web3} = web3Api
-      const balance = await web3.eth.getBalance(contract.address)
-      const fromWei = web3.utils.fromWei(balance, "ether")
+    web3Api.contract && (async () =>{
+      const fromWei = await web3Controller.getBalance(web3Api)
       setBalance(fromWei)
-    }
-    
-    web3Api.contract && getBalance()
-
-  },[web3Api])
-
-
-  useEffect(()=>{
-
-    (async()=>{
-
-      try {
-        const accounts = await web3Api.web3.eth.getAccounts()
-        setAccounts(accounts[0])
-      } catch {}
-
     })()
 
-  },[web3Api.web3])
+  },[web3Api, reload])
 
-    const addFunds = async ()=>{
-      contractFunctions.addFunds(web3Api, "0.01")
-    }
+
+  useEffect(()=>{
+    (async()=>{
+
+      const accounts = await web3Controller.getAccounts(web3Api)
+      setAccount(accounts[0])
+
+    })()
+  },[web3Api, reload])
+
+  const addFunds = async ()=>{
+    await web3Controller.addFunds(web3Api, account)
+    reloadEffect()
+  }
+
+  const withdraw = async ()=>{
+    await web3Controller.withdraw(web3Api, account)
+    reloadEffect()
+  }
     
+  
     return (
       <>
         <br /><br />
@@ -81,14 +76,14 @@ function HomeComponent() {
           <h1>Hallo in your Wallet</h1>
 
           <h3>
-            Your balance is: <Badge bg="secondary">{balance} ETH</Badge>
+            Contract balance is: <Badge bg="secondary">{balance} ETH</Badge>
           </h3>
           <br />
           {
-            accounts 
+            account
             ?
               <Alert key="cdcdcd" variant="secondary">
-                {accounts}
+                {account}
               </Alert>
             : 
               <button onClick={()=> web3Api.provider.request({method: "eth_requestAccounts"})}>
@@ -98,6 +93,7 @@ function HomeComponent() {
 
           <br />
           <button className="btn btn-info" onClick={addFunds}>donaite</button>
+          <button className="btn btn-success m-2" onClick={withdraw}>withdraw</button>
         </div>
       </>
     );
